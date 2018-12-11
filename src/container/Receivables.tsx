@@ -12,17 +12,13 @@ import Typography from '@material-ui/core/Typography';
 import FormControl from '@material-ui/core/FormControl';
 import Button from '../components/Button';
 import TextField from '@material-ui/core/TextField';
-import { NumberFormatCustom } from '../components/Input/NumberFormatCustom';
 import { lang } from '../constants/zh-cn';
-import Drawer from '@material-ui/core/Drawer';
-import Divider from '@material-ui/core/Divider';
+import { Request } from '../cose/Request';
+import URL from '../constants/URL';
 import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import NavigateNext from '@material-ui/icons/NavigateNext';
-import IconButton from '@material-ui/core/IconButton';
-import Clear from '@material-ui/icons/Clear';
-import { queryToObjectWithUrl } from '@sitb/wbs/utils/HttpUtil';
+import ListItem from '@material-ui/core/es/ListItem';
+import Avatar from '@material-ui/core/es/Avatar';
+import ListItemText from '@material-ui/core/es/ListItemText';
 
 const styles: any = theme => ({
   header: {
@@ -62,12 +58,6 @@ const styles: any = theme => ({
   contentTitleTitle: {
     fontSize: 14,
     textAlign: 'center'
-  },
-  drawerAmount: {
-    marginTop: 12
-  },
-  drawerList: {
-    marginTop: 30
   }
 });
 
@@ -76,21 +66,11 @@ class Container extends React.Component<any, any> {
 
   constructor(props, content) {
     super(props, content);
-    let amount = '';
-    let isAmount = false;
-    // 获取url中的参数，是否有金额字段
-    const href = location.href;
-    if (href.indexOf('?') !== -1) {
-      const {transactionAmount} = queryToObjectWithUrl(href);
-      if (transactionAmount) {
-        amount = transactionAmount;
-        isAmount = true;
-      }
-    }
     this.state = {
-      amount,
-      isAmount,
-      isPayState: false
+      keywords: '',
+      isPayState: false,
+      songCount: 0,
+      songs: []
     };
   }
 
@@ -107,23 +87,13 @@ class Container extends React.Component<any, any> {
    * 准备交易
    */
   handleStartPay() {
-    this.switchDrawer(true);
-  }
-
-  /**
-   * drawer开关
-   * @param status 状态
-   */
-  switchDrawer(status) {
-    this.setState({isPayState: status})
-  }
-
-  /**
-   * 开始交易
-   */
-  handlePay() {
-    const {history} = this.props;
-    history.push('/success');
+    const {keywords} = this.state;
+    Request({
+      url: `${URL.search}?keywords=${keywords}`
+    }).then(ref => {
+      const {result: {songCount, songs}} = ref;
+      this.setState({songCount, songs});
+    });
   }
 
   renderHandle() {
@@ -153,7 +123,7 @@ class Container extends React.Component<any, any> {
 
   renderContent() {
     const {classes} = this.props;
-    const {amount, isAmount} = this.state;
+    const {keywords} = this.state;
     return (
       <Grid className={classes.content}
             container
@@ -161,17 +131,13 @@ class Container extends React.Component<any, any> {
         <FormControl fullWidth>
           <TextField className={classes.formControl}
                      label={lang.receivablesAmount}
-                     value={amount}
-                     disabled={isAmount}
-                     onChange={e => this.handleChange(e, 'amount')}
+                     value={keywords}
+                     onChange={e => this.handleChange(e, 'keywords')}
                      id="adornment-amount"
-                     InputProps={{
-                       inputComponent: NumberFormatCustom
-                     }}
           />
           <Button children={lang.confirm}
                   className={classes.contentSubmit}
-                  disabled={amount === ''}
+                  disabled={keywords === ''}
                   onClick={this.handleStartPay}
           />
         </FormControl>
@@ -179,66 +145,39 @@ class Container extends React.Component<any, any> {
     )
   }
 
+  renderListItem() {
+    const {songs} = this.state;
+    return songs.map((song, index) => {
+      const {name, album, artists} = song;
+      return (
+        <ListItem key={index}
+                  button
+        >
+          <Avatar>
+            <img src={album.artist.img1v1Url}/>
+          </Avatar>
+          <ListItemText primary={name}
+                        secondary={`${album.name}-${artists[0].name}`}
+          />
+        </ListItem>
+      )
+    });
+  }
+
   render() {
-    const {classes} = this.props;
-    const {isPayState, amount} = this.state;
+    const {songCount} = this.state;
     return (
       <Grid container
             justify="center"
       >
         {this.renderHandle()}
         {this.renderContent()}
-        <Drawer anchor="bottom"
-                open={isPayState}
-        >
-          <Grid className={classes.drawerContent}>
-            <Grid className={classes.drawerContentTitle}>
-              <IconButton className={classes.contentTitleCloseBtn}
-                          onClick={() => this.switchDrawer(false)}
-              >
-                <Clear/>
-              </IconButton>
-              <Typography variant="h5"
-                          gutterBottom
-                          className={classes.contentTitleTitle}
-              >
-                {lang.payDetailed}
-              </Typography>
-            </Grid>
-            <Divider/>
-            <Typography variant="h3"
-                        align="center"
-                        gutterBottom
-                        className={classes.drawerAmount}
-            >
-              {`¥${amount}`}
-            </Typography>
-            <List component="nav"
-                  className={classes.drawerList}
-            >
-              <ListItem>
-                <ListItemText secondary={lang.orderDetailed}/>
-                <Typography variant="body1">
-                  {lang.receivables}
-                </Typography>
-              </ListItem>
-              <Divider/>
-              <ListItem button>
-                <ListItemText secondary={lang.payType}/>
-                <Typography variant="body1"
-                >
-                  {lang.weChat}
-                </Typography>
-                <NavigateNext/>
-              </ListItem>
-              <Button children={lang.pay}
-                      className={classes.contentSubmit}
-                      disabled={amount === ''}
-                      onClick={this.handlePay}
-              />
-            </List>
-          </Grid>
-        </Drawer>
+        <div>
+          <span>{`搜索结果:${songCount}`}</span>
+        </div>
+        <List>
+          {this.renderListItem()}
+        </List>
       </Grid>
     )
   }

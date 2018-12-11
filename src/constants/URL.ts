@@ -8,7 +8,5 @@ export const {api} = (global as any).config;
 
 
 export default {
-  user: `${api}/users`,
-  register: `${api}/check-value/register`,
-  password: `${api}/check-value/reset-password`
+  search: `${api}/search`
 }
