@@ -3,59 +3,26 @@
  * author: yangyao(873241789@qq.com)
  * date: 2018/8/7
  */
+import './styles/index.scss';
 import 'whatwg-fetch'
 import 'babel-polyfill';
 import 'es6-promise';
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { Promise } from 'es6-promise';
-import { HashRouter, Redirect, Route, Switch } from 'react-router-dom';
-import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
-import blue from '@material-ui/core/colors/blue';
-import './styles/index.scss';
-import { RouterConfig, routerConfig, routerPath } from './cose/router.config';
-import { ErrorBoundary } from './container/ErrorBoundaries';
+import { Provider } from 'react-redux'
+import { Application } from './container/Application';
+import { store } from './cose/store';
 
 require('es6-promise').polyfill();
-
-const theme = createMuiTheme({
-  palette: {
-    primary: {main: blue[500]},
-    secondary: {
-      main: blue[500],
-      contrastText: '#fff'
-    }
-  }
-});
 
 function run() {
   ReactDOM.render(
     <main>
       <section className="background"/>
-      <HashRouter>
-        <MuiThemeProvider theme={theme}>
-          <ErrorBoundary>
-            <Switch>
-              {
-                routerConfig.map((values: RouterConfig, index) => {
-                  document.title = values.title || '';
-                  return (
-                    <Route exact
-                           key={index}
-                           path={values.path}
-                           component={values.component}
-                    />
-                  )
-                })
-              }
-              <Route exact
-                     path={'/'}
-                     render={() => (<Redirect to={routerPath.receivables}/>)}
-              />
-            </Switch>
-          </ErrorBoundary>
-        </MuiThemeProvider>
-      </HashRouter>
+      <Provider store={store}>
+        <Application/>
+      </Provider>
     </main>,
     document.getElementById('application') as HTMLElement
   );

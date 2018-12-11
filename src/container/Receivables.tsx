@@ -4,6 +4,7 @@
  * date: 2018/11/27
  */
 import * as React from 'react';
+import { connect } from 'react-redux';
 import Grid from '@material-ui/core/Grid';
 import Store from '@material-ui/icons/Store';
 import { autoBind } from '@sitb/wbs/autoBind';
@@ -13,12 +14,11 @@ import FormControl from '@material-ui/core/FormControl';
 import Button from '../components/Button';
 import TextField from '@material-ui/core/TextField';
 import { lang } from '../constants/zh-cn';
-import { Request } from '../cose/Request';
-import URL from '../constants/URL';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/es/ListItem';
 import Avatar from '@material-ui/core/es/Avatar';
 import ListItemText from '@material-ui/core/es/ListItemText';
+import { getActions } from '../cose/store';
 
 const styles: any = theme => ({
   header: {
@@ -67,15 +67,12 @@ class Container extends React.Component<any, any> {
   constructor(props, content) {
     super(props, content);
     this.state = {
-      keywords: '',
-      isPayState: false,
-      songCount: 0,
-      songs: []
+      keywords: ''
     };
   }
 
   /**
-   * 保存金额
+   * 搜索字段
    * @param event
    * @param key
    */
@@ -84,18 +81,18 @@ class Container extends React.Component<any, any> {
   };
 
   /**
-   * 准备交易
+   * search
    */
-  handleStartPay() {
+  handleSearch() {
     const {keywords} = this.state;
-    Request({
-      url: `${URL.search}?keywords=${keywords}`
-    }).then(ref => {
-      const {result: {songCount, songs}} = ref;
-      this.setState({songCount, songs});
-    });
+    getActions().search(keywords);
+    console.log('search', keywords);
   }
 
+  /**
+   * 生成头部
+   * @returns {any}
+   */
   renderHandle() {
     const {classes} = this.props;
     return (
@@ -121,8 +118,13 @@ class Container extends React.Component<any, any> {
     );
   }
 
+  /**
+   * 生成内容
+   * @returns {any}
+   */
   renderContent() {
-    const {classes} = this.props;
+    const {classes, processing} = this.props;
+    // 搜索key
     const {keywords} = this.state;
     return (
       <Grid className={classes.content}
@@ -136,18 +138,24 @@ class Container extends React.Component<any, any> {
                      id="adornment-amount"
           />
           <Button children={lang.confirm}
+                  loading={processing}
                   className={classes.contentSubmit}
                   disabled={keywords === ''}
-                  onClick={this.handleStartPay}
+                  onClick={this.handleSearch}
           />
         </FormControl>
       </Grid>
     )
   }
 
+  /**
+   * 生成结果list
+   * @returns {any[]}
+   */
   renderListItem() {
-    const {songs} = this.state;
-    return songs.map((song, index) => {
+    const {content} = this.props;
+    return content.songs.map((song, index) => {
+      // 歌曲name, 详情album, 作者信息artists
       const {name, album, artists} = song;
       return (
         <ListItem key={index}
@@ -165,7 +173,7 @@ class Container extends React.Component<any, any> {
   }
 
   render() {
-    const {songCount} = this.state;
+    const {content} = this.props;
     return (
       <Grid container
             justify="center"
@@ -173,7 +181,7 @@ class Container extends React.Component<any, any> {
         {this.renderHandle()}
         {this.renderContent()}
         <div>
-          <span>{`搜索结果:${songCount}`}</span>
+          <span>{`搜索结果:${content.songCount}`}</span>
         </div>
         <List>
           {this.renderListItem()}
@@ -183,4 +191,7 @@ class Container extends React.Component<any, any> {
   }
 }
 
-export const Receivables = withStyles(styles)(Container as any);
+export const Receivables = connect(({search}) => ({
+  content: search.content,
+  processing: search.processing
+}))(withStyles(styles)(Container as any));
