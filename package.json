@@ -1,0 +1,69 @@
+{
+  "name": "user-webapp",
+  "description": "单点注册、重置密码系统",
+  "version": "1.0.0",
+  "private": false,
+  "scripts": {
+    "start": "arapp serve",
+    "bundle": "arapp bundle",
+    "dll": "arapp dll"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://onegit.app/shangfudata/user/webapp.git"
+  },
+  "keywords": [
+    "react",
+    " javaScript",
+    " typeScript"
+  ],
+  "author": {
+    "name": "yoyo",
+    "email": "873241789@qq.com",
+    "url": "https://github.com/chico-malo"
+  },
+  "license": "MIT",
+  "dllEntry": {
+    "polyfill": [
+      "@babel/polyfill",
+      "whatwg-fetch",
+      "es6-promise"
+    ]
+  },
+  "devServer": {
+    "host": "0.0.0.0",
+    "port": 4000,
+    "api": "http://192.168.88.240:7000"
+  },
+  "dependencies": {
+    "@babel/polyfill": "^7.0.0",
+    "@material-ui/core": "^3.3.1",
+    "@material-ui/icons": "^3.0.1",
+    "@sitb/wbs": "^1.0.81",
+    "babel-polyfill": "^6.26.0",
+    "connected-react-router": "^4.5.0",
+    "es6-promise": "^4.2.5",
+    "normalize.css": "^8.0.0",
+    "react": "^16.5.1",
+    "react-dom": "^16.5.1",
+    "react-router-dom": "^4.3.1",
+    "veigar": "^1.0.0-Alpha.12",
+    "whatwg-fetch": "^3.0.0"
+  },
+  "devDependencies": {
+    "@babel/preset-react": "^7.0.0",
+    "@sitb/arapp-cli": "^1.0.0-Aplha.35",
+    "autoprefixer": "^9.3.1",
+    "awesome-typescript-loader": "^5.2.1",
+    "css-loader": "^1.0.0",
+    "file-loader": "^2.0.0",
+    "node-sass": "^4.9.4",
+    "postcss-loader": "^3.0.0",
+    "react-number-format": "^4.0.4",
+    "sass-loader": "^7.1.0",
+    "source-map-loader": "^0.2.4",
+    "style-loader": "^0.23.1",
+    "uglifyjs-webpack-plugin": "^2.0.1",
+    "url-loader": "^1.1.2"
+  }
+}
