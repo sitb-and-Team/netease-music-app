@@ -4,6 +4,7 @@
  * date: 2018/12/11
  */
 import { search as types } from '../constants/actionType';
+import objectPath from 'object-path';
 
 const initialState: any = {
   content: {
@@ -13,8 +14,8 @@ const initialState: any = {
   processing: false
 };
 
-export function search(state = initialState, {type, payload}) {
-  switch (type) {
+export function search(state = initialState, action) {
+  switch (action.type) {
     case types.startQuery: {
       return {
         ...state,
@@ -22,12 +23,13 @@ export function search(state = initialState, {type, payload}) {
       };
     }
     case types.queryComplete: {
-      const {success, result} = payload;
-      console.log(payload);
+      const {success, payload} = action;
+      let result = objectPath.get(payload, 'result');
+      let songs = objectPath.get(payload, 'result.songs');
       return {
         ...state,
         processing: false,
-        content: (success && result && result.songs) && result || state.content
+        content: (success && result && songs) && payload.result || state.content
       };
     }
     default: {
