@@ -4,8 +4,6 @@
  * date: 2018/8/10
  */
 
-import { dispatch } from './store';
-
 /**
  * ajax请求
  * @param {any} url 请求地址
@@ -16,32 +14,34 @@ import { dispatch } from './store';
  * @constructor
  */
 export class Request {
-  static async quest({url, method = 'GET', headers = {}, type, ...other}) {
-    await fetch(url, {
+  static async execute({url, method = 'GET', headers = {}, type, ...other}) {
+    let response = await fetch(url, {
       method: method,
       headers: {
         'Content-Type': 'application/json',
         ...headers
       },
       ...other
-    }).then(res => res.json(),
-      error => {
-        console.log('发生错误,', error);
-        dispatch({
-          type, payload: {
-            success: false
-          }
-        })
+    });
+    // 默认请求是不同的
+    let res: any = {
+      success: false
+    };
+    try {
+      // 如果请求成功，转换资源格式
+      if (response.ok) {
+        let payload = await response.json();
+        res = {
+          success: true,
+          payload
+        };
       }
-    )
-      .then(payload => {
-        console.log('请求成功=>', payload);
-        dispatch({
-          type, payload: {
-            success: true,
-            ...payload
-          }
-        });
-      });
+    } catch (e) {
+      console.warn('出现了一个错误=>', url, e);
+    }
+    return {
+      ...res,
+      type
+    }
   }
 }
