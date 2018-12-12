@@ -85,7 +85,8 @@ class Container extends React.Component<any, any> {
    */
   handleSearch() {
     const {keywords} = this.state;
-    getActions().search(keywords);
+    console.log(getActions());
+    getActions().search.startQuery(keywords);
     console.log('search', keywords);
   }
 

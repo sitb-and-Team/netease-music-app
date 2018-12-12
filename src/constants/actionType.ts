@@ -14,4 +14,3 @@ export const search: any = createActionType('search', {
   startQuery: '',
   queryComplete: ''
 });
-

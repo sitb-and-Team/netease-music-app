@@ -12,7 +12,7 @@ import * as ReactDOM from "react-dom";
 import { Promise } from 'es6-promise';
 import { Provider } from 'react-redux'
 import { Application } from './container/Application';
-import { store } from './cose/store';
+import {getStore} from './cose/store';
 
 require('es6-promise').polyfill();
 
@@ -20,7 +20,7 @@ function run() {
   ReactDOM.render(
     <main>
       <section className="background"/>
-      <Provider store={store}>
+      <Provider store={getStore()}>
         <Application/>
       </Provider>
     </main>,

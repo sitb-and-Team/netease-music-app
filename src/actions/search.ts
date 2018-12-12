@@ -6,13 +6,23 @@
 import { search as types } from '../constants/actionType';
 import { Request } from '../cose/Request';
 import URL from '../constants/URL';
+import { ofType } from 'redux-observable';
+import { switchMap } from 'rxjs/internal/operators';
 
-export function search(value) {
-  Request.quest({
-    url: `${URL.search}?keywords=${value}`,
-    type: types.queryComplete
-  });
-  return ({
-    type: types.startQuery
-  })
+export function search(action$) {
+  return action$.pipe(
+    ofType(types.startQuery),
+    switchMap(({payload}) => Request.quest({
+      url: `${URL.search}?keywords=${payload}`,
+      type: types.queryComplete
+    })))
+}
+
+export function searchs(action$) {
+  return action$.pipe(
+    ofType(types.startQuery),
+    switchMap(({payload}) => Request.quest({
+      url: `${URL.search}?keywords=${payload}`,
+      type: types.queryComplete
+    })))
 }
