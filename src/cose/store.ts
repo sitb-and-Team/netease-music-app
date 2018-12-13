@@ -1,4 +1,4 @@
-import { applyMiddleware, createStore, bindActionCreators } from 'redux';
+import { applyMiddleware, bindActionCreators, createStore } from 'redux';
 import commonReducers from '../reducers';
 import commonEpics from '../actions';
 import storageHistorical from '../middleware/storageHistorical';
@@ -43,7 +43,7 @@ Object.keys(actionTypes).forEach(action => Object.keys(actionTypes[action]).forE
   actions[action][type] = bindActionCreators((...args) => ({
     type: actionTypes[action][type],
     payload: args
-  }), store.dispatch);
+  }), store.dispatch)
 }));
 
 data.actions = actions;
