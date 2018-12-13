@@ -18,7 +18,8 @@ export const lang = {
 
 export const menu = {
   receivables: '收款',
-  receivablesDetailed: '收款详情'
+  receivablesSuccess: '收款详情',
+  receivablesError: '收款详情'
 };
 
 export const statusCode = {
