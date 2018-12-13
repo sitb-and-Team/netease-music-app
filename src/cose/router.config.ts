@@ -27,11 +27,11 @@ export const routerConfig: Array<RouterConfig> = [{
   path: routerPath.receivables,
   component: Receivables
 }, {
-  title: menu.receivablesDetailed,
+  title: menu.receivablesSuccess,
   path: routerPath.success,
   component: SuccessPage
 }, {
-  title: menu.receivablesDetailed,
+  title: menu.receivablesError,
   path: routerPath.error,
   component: ErrorPage
 }];
