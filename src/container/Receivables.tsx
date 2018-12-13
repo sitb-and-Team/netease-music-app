@@ -5,20 +5,22 @@
  */
 import * as React from 'react';
 import { connect } from 'react-redux';
+import { Map } from 'Immutable';
 import Grid from '@material-ui/core/Grid';
 import Store from '@material-ui/icons/Store';
 import { autoBind } from '@sitb/wbs/autoBind';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import FormControl from '@material-ui/core/FormControl';
-import Button from '../components/Button';
 import TextField from '@material-ui/core/TextField';
-import { lang } from '../constants/zh-cn';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/es/ListItem';
 import Avatar from '@material-ui/core/es/Avatar';
 import ListItemText from '@material-ui/core/es/ListItemText';
+
 import { getActions } from '../cose/store';
+import Button from '../components/Button';
+import { lang } from '../constants/zh-cn';
 
 const styles: any = theme => ({
   header: {
@@ -67,7 +69,9 @@ class Container extends React.Component<any, any> {
   constructor(props, content) {
     super(props, content);
     this.state = {
-      keywords: ''
+      data: Map({
+        keywords: ''
+      })
     };
   }
 
@@ -77,15 +81,17 @@ class Container extends React.Component<any, any> {
    * @param key
    */
   handleChange(event, key) {
-    this.setState({[key]: event.target.value});
+    const value = event.target.value;
+    this.setState(({data}) => ({
+      data: data.update(key, () => value)
+    }));
   };
 
   /**
    * search
    */
   handleSearch() {
-    const {keywords} = this.state;
-    console.log(getActions());
+    const keywords = this.state.data.get('keywords');
     getActions().search.startQuery(keywords);
     console.log('search', keywords);
   }
@@ -124,9 +130,10 @@ class Container extends React.Component<any, any> {
    * @returns {any}
    */
   renderContent() {
-    const {classes, processing} = this.props;
+    const {classes} = this.props;
+    const processing = this.props.search.get('processing');
     // 搜索key
-    const {keywords} = this.state;
+    const keywords = this.state.data.get('keywords');
     return (
       <Grid className={classes.content}
             container
@@ -154,8 +161,8 @@ class Container extends React.Component<any, any> {
    * @returns {any[]}
    */
   renderListItem() {
-    const {content} = this.props;
-    return content.songs.map((song, index) => {
+    const {songs} = this.props.search.get('page');
+    return songs.map((song: any, index) => {
       // 歌曲name, 详情album, 作者信息artists
       const {name, album, artists} = song;
       return (
@@ -174,7 +181,7 @@ class Container extends React.Component<any, any> {
   }
 
   render() {
-    const {content} = this.props;
+    const {songCount} = this.props.search.get('page');
     return (
       <Grid container
             justify="center"
@@ -182,7 +189,7 @@ class Container extends React.Component<any, any> {
         {this.renderHandle()}
         {this.renderContent()}
         <div>
-          <span>{`搜索结果:${content.songCount}`}</span>
+          <span>{`搜索结果:${songCount}`}</span>
         </div>
         <List>
           {this.renderListItem()}
@@ -192,7 +199,6 @@ class Container extends React.Component<any, any> {
   }
 }
 
-export const Receivables = connect(({search}) => ({
-  content: search.content,
-  processing: search.processing
+export const Receivables = connect((state) => ({
+  search: state.get('search')
 }))(withStyles(styles)(Container as any));
